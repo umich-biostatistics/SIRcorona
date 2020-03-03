@@ -3,6 +3,7 @@ library(shiny)
 library(png)
 library(stringr)
 library(tidyverse)
+library(exdata)
 
 ui = fluidPage(
   tags$head(
@@ -31,23 +32,28 @@ ui = fluidPage(
       submitButton("Update View", icon("refresh"))
     ),
     mainPanel(
-      textOutput('files'),
-      imageOutput('infected'),
-      imageOutput('removed'),
-      imageOutput('spaghetti')
+      hr(),
+      p(h3(strong('Infected'))),
+      imageOutput('infected', width = 900, height = 800),
+      hr(),
+      p(h3(strong('Removed'))),
+      imageOutput('removed', width = 900, height = 800),
+      hr(),
+      p(h3(strong('Spaghetti'))),
+      imageOutput('spaghetti', width = 900, height = 800)
     )
   )
 )
 
 server = function(input, output) {
   
-  link = read_csv('data/link.csv')
+  link = exdata::link
   URL = 'ftp://xfer1.bio.sph.umich.edu/ncov2019/'
   
-  buildPath = reactive({
-    path = paste0('ftp://xfer1.bio.sph.umich.edu/ncov2019/', files())
-    print(path)
-  })
+  # buildPath = reactive({
+  #   path = paste0('ftp://xfer1.bio.sph.umich.edu/ncov2019/', files())
+  #   print(path)
+  # })
   
   files = reactive({
     date = input$day
@@ -77,9 +83,43 @@ server = function(input, output) {
     middle_path = paste(paste(input$day, calibrate, sep = '/'), '', sep = '/')
     fls = paste0('ftp://xfer1.bio.sph.umich.edu/ncov2019/', middle_path, fls)
     outfile = tempfile(fileext='.png')
-    download.file(url = fls, destfile = outfile)
-    
-  })
+    download.file(url = fls, destfile = outfile, mode = 'wb')
+    print(outfile)
+    print(fls)
+    list(src = outfile,
+         alt = "alternate text",
+         width = 900)
+  }, deleteFile = TRUE)
+  
+  output$removed = renderImage({
+    fls = files()
+    fls = fls[str_detect(string = fls, pattern = fixed('forecast2.'))]
+    calibrate = ifelse(input$calib == 'wout_calib', 'without_calibration', 'with_calibration')
+    middle_path = paste(paste(input$day, calibrate, sep = '/'), '', sep = '/')
+    fls = paste0('ftp://xfer1.bio.sph.umich.edu/ncov2019/', middle_path, fls)
+    outfile = tempfile(fileext='.png')
+    download.file(url = fls, destfile = outfile, mode = 'wb')
+    print(outfile)
+    print(fls)
+    list(src = outfile,
+         alt = "alternate text",
+         width = 900)
+  }, deleteFile = TRUE)
+  
+  output$spaghetti = renderImage({
+    fls = files()
+    fls = fls[str_detect(string = fls, pattern = fixed('spaghetti.'))]
+    calibrate = ifelse(input$calib == 'wout_calib', 'without_calibration', 'with_calibration')
+    middle_path = paste(paste(input$day, calibrate, sep = '/'), '', sep = '/')
+    fls = paste0('ftp://xfer1.bio.sph.umich.edu/ncov2019/', middle_path, fls)
+    outfile = tempfile(fileext='.png')
+    download.file(url = fls, destfile = outfile, mode = 'wb')
+    print(outfile)
+    print(fls)
+    list(src = outfile,
+         alt = "alternate text",
+         width = 900)
+  }, deleteFile = TRUE)
   
   # drec = 'data/2020-02-26/'
   # dirpng = dir(drec)
