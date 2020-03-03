@@ -22,7 +22,7 @@ ui = fluidPage(
   sidebarLayout(
     sidebarPanel(
       helpText('Use the drop-down menus to view model results by day, location, and model.'),
-      selectInput('day', 'Select day', c('2020-02-27', '2020-02-28', '2020-02-29')),
+      selectInput('day', 'Select day', c('2020-02-28', '2020-02-29', '2020-03-01')),
       checkboxGroupInput('calib', 'With or without calibration?', 
                          choices = c('With calibration' = 'w_calib', 'Without calibration' = 'wout_calib'),
                          selected = 'wout_calib'),
@@ -48,6 +48,7 @@ ui = fluidPage(
 server = function(input, output) {
   
   link = exdata::link
+    #read_csv('data/link.csv')
   URL = 'ftp://xfer1.bio.sph.umich.edu/ncov2019/'
   
   # buildPath = reactive({
