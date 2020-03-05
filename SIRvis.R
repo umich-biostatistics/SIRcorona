@@ -47,14 +47,9 @@ ui = fluidPage(
 
 server = function(input, output) {
   
-  link = exdata::link
-    #read_csv('data/link.csv')
   URL = 'ftp://xfer1.bio.sph.umich.edu/ncov2019/'
   
-  # buildPath = reactive({
-  #   path = paste0('ftp://xfer1.bio.sph.umich.edu/ncov2019/', files())
-  #   print(path)
-  # })
+  link = paste0(URL, 'link.csv')
   
   files = reactive({
     date = input$day
@@ -70,8 +65,6 @@ server = function(input, output) {
       dat = link %>% filter(Date == date & Location == location & Function == func) %>% pull(File)
     }
     
-    # dat = link %>% filter(Date == date, Location == location, Function == func, 
-    #                       Calibration == calibrate) %>% select(File) %>% as.character()
     return(dat)
   })
   
@@ -88,7 +81,7 @@ server = function(input, output) {
     print(outfile)
     print(fls)
     list(src = outfile,
-         alt = "alternate text",
+         alt = "Plot not found",
          width = 900)
   }, deleteFile = TRUE)
   
@@ -103,7 +96,7 @@ server = function(input, output) {
     print(outfile)
     print(fls)
     list(src = outfile,
-         alt = "alternate text",
+         alt = "Plot not found",
          width = 900)
   }, deleteFile = TRUE)
   
@@ -118,51 +111,10 @@ server = function(input, output) {
     print(outfile)
     print(fls)
     list(src = outfile,
-         alt = "alternate text",
+         alt = "Plot not found",
          width = 900)
   }, deleteFile = TRUE)
   
-  # drec = 'data/2020-02-26/'
-  # dirpng = dir(drec)
-  # pngs = dirpng[str_which(dir('data/2020-02-26/'), ".png")]
-  # pngs_spl = str_split(pngs, pattern = '_')
-  # 
-  # soptions = reactive({
-  #   #model = input$model
-  #   func = input$func
-  #   location = input$location
-  #   day = input$day
-  #   
-  #   png_list =
-  #     lapply(pngs_spl, function(char) {
-  #       if ((day == char[1]) & (location == char[2]) & (func == char[3])) {
-  #         picture_path = paste(drec, paste(char, collapse = '_'), sep = '')
-  #         picture = readPNG(picture_path)
-  #         type = str_sub(char[5], end = -5)
-  #         return(c('picture' = picture, 'type' = type))
-  #       }
-  #     })
-  #   
-  #   return(png_list)
-  # })
-  # 
-  # output$infected = renderImage({
-  #   pics = soptions()
-  #   png_list['picture'][str_which(pics[['type']], 'forecast')][1]
-  #   return(png_list['picture'][str_which(pics[['type']], 'forecast')][1])
-  # })
-  # 
-  # output$removed = renderImage({
-  #   pics = soptions()
-  #   
-  #   return(png_list['picture'][str_which(pics[['type']], 'forecast2')][1])
-  # })
-  # 
-  # output$spaghetti = renderImage({
-  #   pics = soptions()
-  #   
-  #   return(png_list['picture'][str_which(pics[['type']], 'spaghetti')][1])
-  # })
 }
 
 shinyApp(ui, server)
