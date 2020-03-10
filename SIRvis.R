@@ -22,7 +22,7 @@ ui = fluidPage(
   sidebarLayout(
     sidebarPanel(
       helpText('Use the drop-down menus to view model results by day, location, and model.'),
-      selectInput('day', 'Select day', c('2020-02-28', '2020-02-29', '2020-03-01')),
+      selectInput('day', 'Select day', c("2020-03-05")),
       checkboxGroupInput('calib', 'With or without calibration?', 
                          choices = c('With calibration' = 'w_calib', 'Without calibration' = 'wout_calib'),
                          selected = 'wout_calib'),
@@ -45,11 +45,37 @@ ui = fluidPage(
   )
 )
 
-server = function(input, output) {
+server = function(input, output, session) {
   
   URL = 'ftp://xfer1.bio.sph.umich.edu/ncov2019/'
   
-  link = paste0(URL, 'link.csv')
+  linkfile = tempfile(fileext='.csv')
+  download.file(url = paste0(URL, 'link.csv'), destfile = linkfile, mode = 'wb')
+  link = read_csv(linkfile) 
+  
+  observe({
+    req(link)
+    daychoices = link %>% pull(Date) %>% unique()
+    updateSelectInput(session, 'day', 
+                      choices = daychoices,
+                      selected = daychoices[1])
+  })
+  
+  observe({
+    req(link)
+    locationchoices = link %>% pull(Location) %>% unique()
+    updateSelectInput(session, 'location', 
+                      choices = locationchoices,
+                      selected = locationchoices[1])
+  })
+  
+  observe({
+    req(link)
+    funcchoices = link %>% pull(Function) %>% unique()
+    updateSelectInput(session, 'func', 
+                      choices = funcchoices,
+                      selected = funcchoices[1])
+  })
   
   files = reactive({
     date = input$day
